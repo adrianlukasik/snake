@@ -58,7 +58,7 @@ class Game(object):
         self.screen.fill(BLACK)
         self.item.draw(self.screen, RED, DARK_RED)
         self.snake.draw(self.screen)
-        self.screen.blit(self.text_render, (0, 0))
+        self.screen.blit(self.text_render, (MARGIN, MARGIN))
         pygame.display.flip()
 
     def run(self):
