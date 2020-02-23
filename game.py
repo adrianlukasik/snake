@@ -16,6 +16,9 @@ class Game(object):
         self.snake = Snake()
         self.item = Element(self.snake)
         self.key = pygame.K_d
+        self.font = pygame.font.SysFont("georgia", 20)
+        self.counter = 0
+        self.text_render = self.font.render(str(self.counter), 1, WHITE)
 
         self.run()
 
@@ -45,6 +48,8 @@ class Game(object):
 
             if self.item.isColision(self.snake):
                 self.snake.extend()
+                self.counter += 1
+                self.text_render = self.font.render(str(self.counter), 1, WHITE)
                 self.item = Element(self.snake)
 
             self.tps_delta -= 1 / TPS_MAX
@@ -53,6 +58,7 @@ class Game(object):
         self.screen.fill(BLACK)
         self.item.draw(self.screen, RED, DARK_RED)
         self.snake.draw(self.screen)
+        self.screen.blit(self.text_render, (0, 0))
         pygame.display.flip()
 
     def run(self):
