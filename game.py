@@ -9,49 +9,57 @@ class Game(object):
 
     def __init__(self):
         pygame.init()
-        screen = pygame.display.set_mode(RESOLUTION)
         pygame.display.set_caption('Snake')
+        self.screen = pygame.display.set_mode(RESOLUTION)
+        self.tps_clock = pygame.time.Clock()
+        self.tps_delta = 0.0
+        self.snake = Snake()
+        self.item = Element(self.snake)
+        self.key = pygame.K_d
 
-        tps_clock = pygame.time.Clock()
-        tps_delta = 0.0
-        snake = Snake()
-        item = Element(snake)
-        key = pygame.K_d
+        self.run()
 
+    def handleEvents(self):
+        events = pygame.event.get()
+        for event in events:
+            if event.type == pygame.QUIT:
+                sys.exit(0)
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                sys.exit(0)
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_s and self.key != pygame.K_w:
+                self.key = pygame.K_s
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_w and self.key != pygame.K_s:
+                self.key = pygame.K_w
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_d and self.key != pygame.K_a:
+                self.key = pygame.K_d
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_a and self.key != pygame.K_d:
+                self.key = pygame.K_a
+
+    def ticking(self):
+        self.tps_delta += self.tps_clock.tick() / 1000.0
+        while self.tps_delta > 1 / TPS_MAX:
+            self.snake.move(self.key)
+
+            if self.snake.isColision():
+                sys.exit(0)
+
+            if self.item.isColision(self.snake):
+                self.snake.extend()
+                self.item = Element(self.snake)
+
+            self.tps_delta -= 1 / TPS_MAX
+
+    def draw(self):
+        self.screen.fill(BLACK)
+        self.item.draw(self.screen, RED, DARK_RED)
+        self.snake.draw(self.screen)
+        pygame.display.flip()
+
+    def run(self):
         while True:
-            # Handle events
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    sys.exit(0)
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                    sys.exit(0)
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_s and key != pygame.K_w:
-                    key = pygame.K_s
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_w and key != pygame.K_s:
-                    key = pygame.K_w
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_d and key != pygame.K_a:
-                    key = pygame.K_d
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_a and key != pygame.K_d:
-                    key = pygame.K_a
+            self.handleEvents()
+            self.ticking()
+            self.draw()
 
-            # Ticking
-            tps_delta += tps_clock.tick() / 1000.0
-            while tps_delta > 1 / TPS_MAX:
-                snake.move(key)
-
-                if snake.isColision():
-                    sys.exit(0)
-
-                if item.isColision(snake):
-                    snake.extend()
-                    item = Element(snake)
-
-                tps_delta -= 1 / TPS_MAX
-
-            # Drawing
-            screen.fill(BLACK)
-            item.draw(screen, RED, DARK_RED)
-            snake.draw(screen)
-            pygame.display.flip()
 
 Game()
